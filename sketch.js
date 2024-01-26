@@ -1,6 +1,8 @@
 disparo = false;
 const velocidadInicial = 50;
 const gravedad = 1.8;
+var barcosDestruidos = 0;
+var volumen = 0.1;
 function preload() {
   fondo=loadImage("./recursos/background.gif");
   torreIMG=loadImage("./recursos/torre.png");
@@ -10,6 +12,10 @@ function preload() {
   barcoANI=loadAnimation("./recursos/barco_0.png","./recursos/barco_1.png","./recursos/barco_2.png","./recursos/barco_3.png");
   barcobyebyeANI=loadAnimation("./recursos/hundir_barco_00.png","./recursos/hundir_barco_01.png","./recursos/hundir_barco_02.png","./recursos/hundir_barco_03.png","./recursos/hundir_barco_04.png","./recursos/hundir_barco_05.png","./recursos/hundir_barco_06.png","./recursos/hundir_barco_07.png","./recursos/hundir_barco_08.png","./recursos/hundir_barco_09.png","./recursos/hundir_barco_10.png");
   balaAguaANI=loadAnimation("./recursos/sprite_0.png","./recursos/sprite_1.png","./recursos/sprite_2.png","./recursos/sprite_3.png");
+  pirataRiendo=loadSound("./recursos/sonido_burla.mp3");
+  explosion=loadSound("./recursos/sonido_explosion.mp3");
+  chapoteo=loadSound("./recursos/sonido_agua.mp3");
+  musicaFondo=loadSound("./recursos/background_music.mp3");
 }
 
 function setup() {
@@ -36,13 +42,19 @@ function draw() {
   crearBarco();
   balasGRP.overlap(barcosGRP, destruirBarco);
   torre.overlap(barcosGRP, gameOver);
-  
+  fill("black");
+  textSize(20);
+  text("Barcos destruidos: "+barcosDestruidos,1000,40);
   barcosGRP.forEach(barco => {
     if(barco.getAnimationLabel()=="barcobyebyeANI" && barco.animation.getFrame()==barco.animation.getLastFrame()){
       barco.destroy();
-      console.log("Hello World");
+      barcosDestruidos++;
     }
   });
+  if(!musicaFondo.isPlaying()){
+    musicaFondo.play();
+    musicaFondo.setVolume(volumen);
+  }
 }
 
 function apuntarCanon(){
@@ -67,6 +79,10 @@ function dispararBala(){
     bala.setCollider("circle",0,0,130);
     bala.addAnimation("balaAguaANI",balaAguaANI);
     bala.cayo=false;
+    if(!explosion.isPlaying()){
+      explosion.play();
+      explosion.setVolume(volumen);
+    }
   }
   for(i = 0; i < balasGRP.length; i++){
     BALA=balasGRP[i];
@@ -80,7 +96,10 @@ function dispararBala(){
       BALA.changeAnimation("balaAguaANI",balaAguaANI);
       BALA.scale=0.4;
       BALA.animation.looping = false;
-  
+      if(!chapoteo.isPlaying()){
+        chapoteo.play();
+        chapoteo.setVolume(volumen);
+      }
     }
   if(BALA.cayo==true && BALA.getAnimationLabel() == "balaAguaANI" && BALA.animation.getFrame()==BALA.animation.getLastFrame()){
     BALA.destroy();
@@ -116,5 +135,12 @@ function gameOver(torre, barco){
     imageUrl: "./recursos/barco_0.png",
     imageSize: "300x300",
     confirmButtonText: "Jugar de Nuevo"
+  }, 
+  function (confirmacion){
+    location.reload();
   });
+  if(!pirataRiendo.isPlaying()){
+    pirataRiendo.play();
+    pirataRiendo.setVolume(volumen);
+  }
 }
