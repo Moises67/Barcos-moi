@@ -3,6 +3,7 @@ const velocidadInicial = 50;
 const gravedad = 1.8;
 var barcosDestruidos = 0;
 var volumen = 0.1;
+var game = false;
 function preload() {
   fondo=loadImage("./recursos/background.gif");
   torreIMG=loadImage("./recursos/torre.png");
@@ -35,24 +36,28 @@ function setup() {
 }
 
 function draw() {
-  image(fondo,0,0,1200,600);
-  drawSprites();
-  apuntarCanon();
-  dispararBala();
-  crearBarco();
-  balasGRP.overlap(barcosGRP, destruirBarco);
-  torre.overlap(barcosGRP, gameOver);
-  fill("black");
-  textSize(20);
-  text("Barcos destruidos: "+barcosDestruidos,1000,40);
-  barcosGRP.forEach(barco => {
-    if(barco.getAnimationLabel()=="barcobyebyeANI" && barco.animation.getFrame()==barco.animation.getLastFrame()){
-      barco.destroy();
-      barcosDestruidos++;
-    }
-  });
-  if(!musicaFondo.isPlaying()){
-    musicaFondo.play();
+  if(game == true){
+      image(fondo,0,0,1200,600);
+    drawSprites();
+    apuntarCanon();
+    dispararBala();
+    crearBarco();
+    balasGRP.overlap(barcosGRP, destruirBarco);
+    torre.overlap(barcosGRP, gameOver);
+    fill("black");
+    textSize(20);
+    text("Barcos destruidos: "+barcosDestruidos,1000,40);
+    barcosGRP.forEach(barco => {
+      if(barco.getAnimationLabel()=="barcobyebyeANI" && barco.animation.getFrame()==barco.animation.getLastFrame()){
+        barco.destroy();
+        barcosDestruidos++;
+      }
+    });
+    if(!musicaFondo.isPlaying()){
+      musicaFondo.play();
+      musicaFondo.setVolume(volumen);
+  }
+  else{
     musicaFondo.setVolume(volumen);
   }
 }
@@ -63,6 +68,7 @@ function apuntarCanon(){
   }
   if(keyDown(37) && canon.rotation >=-85){
     canon.rotation-=1;
+  }
   }
 }
 
@@ -143,4 +149,17 @@ function gameOver(torre, barco){
     pirataRiendo.play();
     pirataRiendo.setVolume(volumen);
   }
+}
+
+function start(){
+  game=true;
+  document.getElementById("starT").style.display="none";
+}
+
+function cambiarVolumen(){
+  volumen=document.getElementById("volumE").value/100;
+  piratasRiendo.setVolume(volumen);
+  musicaFondo.setVolume(volumen);
+  chapoteo.setVolume(volumen);
+  explosion.setVolume(volumen);
 }
